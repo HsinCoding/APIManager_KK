@@ -11,14 +11,30 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol APIManagerDelegate <NSObject>
+
+- (void)fetchGetResponse:(NSDictionary *)dict;
+- (void)postCustomerName:(NSDictionary *)dict;
+- (void)fetchImageWithCallback:(UIImage *)img;
+
+@end
+
+
 @interface APIManager : NSObject
 
 +(APIManager *) sharedInstance;
 
+// Block
 - (void) fetchGetResponseWithCallback:(void (^)(NSDictionary *dict, NSError *error))callback;
-- (void) postCustomerName:(NSString *)name callback:(void(^)(NSDictionary *dict, NSError *error))callback;
+- (void) postCustomerName:(NSString * __nullable)name callback:(void(^)(NSDictionary *dict, NSError *error))callback;
 - (void) fetchImageWithCallback:(void(^)(UIImage *img, NSError *error))callback;
 
+// Delegate
+- (void)fetchGetResponse;
+- (void)postCustomerName:(NSString *__nullable)name;
+- (void)fetchImageWithCallback;
+
+@property (weak, nonatomic) id<APIManagerDelegate> delegate;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -9,9 +9,12 @@
 #import "ViewController.h"
 #import "APIManager.h"
 
-@interface ViewController ()
+@interface ViewController ()<APIManagerDelegate>
+   
 
-@property (weak, nonatomic) IBOutlet UIImageView *imgView;
+
+@property (weak, nonatomic) IBOutlet UIImageView *bolckImgView;
+@property (weak, nonatomic) IBOutlet UIImageView *delegateImgView;
 
 
 @end
@@ -20,22 +23,59 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    #pragma mark - Block
     [[APIManager sharedInstance] fetchGetResponseWithCallback:^(NSDictionary * _Nonnull dict, NSError * _Nonnull error) {
-        
+        if (error == nil) {
+            NSLog(@"Dict: %@",dict);
+        } else {
+            NSLog(@"Error: %@",error);
+        }
+       
     }];
     
+    
     [[APIManager sharedInstance] postCustomerName:nil callback:^(NSDictionary * _Nonnull dict, NSError * _Nonnull error) {
-        
+        if (error == nil) {
+            NSLog(@"Dict: %@",dict);
+        } else {
+            NSLog(@"Error: %@",error);
+        }
     }];
     
     [[APIManager sharedInstance] fetchImageWithCallback:^(UIImage * _Nonnull img, NSError * _Nonnull error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-             [self.imgView  setImage:img];
-        }) ;
-       
-        
+        if (error == nil) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.bolckImgView  setImage:img];
+            }) ;
+        } else {
+            NSLog(@"Error: %@",error);
+        }
     }];
     
+    
+    #pragma mark - Delegate
+    [APIManager sharedInstance].delegate = self;
+    [[APIManager sharedInstance] fetchGetResponse];
+    [[APIManager sharedInstance] postCustomerName:nil];
+    [[APIManager sharedInstance] fetchImageWithCallback];
+}
+
+#pragma mark - APIManagerDelegate
+
+- (void)fetchGetResponse:(NSDictionary *)dict {
+    NSLog(@"Dict: %@",dict);
+}
+
+- (void)postCustomerName:(NSDictionary *)dict {
+    NSLog(@"Dict: %@",dict);
+}
+
+- (void)fetchImageWithCallback:(UIImage *)img {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->_delegateImgView setImage:img];
+    });
+  
 }
 
 
